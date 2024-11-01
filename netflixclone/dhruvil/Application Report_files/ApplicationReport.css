@@ -1,0 +1,396 @@
+﻿.container {
+    border: 2px solid black;
+    width: 100% !important;
+    border: hidden;
+}
+
+* {
+    -webkit-print-color-adjust: exact !important;
+    /* Chrome, Safari */
+    color-adjust: exact !important;
+    /*Firefox*/
+}
+
+body {
+    padding-top: 20px;
+    padding-bottom: 20px;
+    /* previous setting */
+    /* margin: 0px; */
+    margin: 10mm 5mm 10mm 5mm;
+    /* margin you want for the content */
+    counter-reset: Serial;
+    counter-reset: Serial2;
+    counter-reset: secCount;
+    
+}
+/*
+b{
+    color: red;
+}*/
+
+[class^=col-] {
+    border: 1px solid grey;
+}
+
+#signatureContainer {
+    border-top: hidden;
+}
+
+#profilePhotoContainer {
+    border-bottom: hidden;
+}
+
+#nameInfo {
+    text-align: center;
+}
+
+#nameInfo {
+    font-weight: bold;
+}
+
+#courseAppliedSec, #admissionDateSec {
+    height: 50% !important;
+    border: 1px solid gray !important;
+}
+
+#courseAndAdmissionDateContainer .col-sm-12 {
+    padding: 5px;
+    border-bottom: hidden;
+}
+
+#profilePhotoContainer .img-fluid, #clgLogoContainer .img-fluid {
+    height: 170px;
+    padding: 5px;
+}
+
+#signatureContainer .img-fluid {
+    height: auto;
+    padding: 5px;
+}
+
+#addressTitle, #personalInfoTitle, #contactTitle, #reservationTitle, #socialReservationTitle, #educationDetailTitle, #qualifyingExamTitle, #subjectSectionTitle, #attachedDocsTitle, #parentInfoSecTitle, #otherInfoSecTitle, #studentDeclarationTitle, #guardianDeclarationTitle, #forCollegeTitle, #admissionTitle {
+    padding: 5px;
+}
+
+#addressContainer :nth-child(3) {
+    padding: 10px;
+}
+
+#addressContainer :nth-child(12) {
+    padding: 10px;
+}
+
+#instituteName {
+    text-align: center;
+    font-weight: bold;
+    padding: 20px;
+}
+
+#subAddress {
+    font-weight: 500;
+    margin-top: 15px;
+    display: block;
+}
+
+#tableOneContainer, #tableTwoContainer, #tableThreeContainer, #tableFourContainer, #tableFiveContainer, #tableSixContainer {
+    padding: 10px;
+}
+
+    #tableTwoContainer{
+        width:97%;
+    }
+
+    table thead {
+        text-align: center;
+    }
+
+table.table-bordered {
+    border: 1px solid rgb(0, 0, 0);
+}
+
+    table.table-bordered > thead > tr > th {
+        border: 1px solid rgb(0, 0, 0) !important;
+    }
+
+    table.table-bordered > tbody > tr > td {
+        border: 1px solid rgb(0, 0, 0) !important;
+    }
+
+#subHeading {
+    /* margin-top: 20px !important; */
+    display: block;
+    padding-top: 5px;
+    padding-bottom: 10px;
+}
+
+#groupName {
+    text-align: left;
+    /* background: url("image/bg.png") !important; */
+    -webkit-print-color-adjust: exact !important;
+    background-color: #b3b3b3 !important;
+}
+
+#tableFourContainer {
+    border: hidden;
+}
+
+#studentDeclarationContainer, #guardianDeclationContainer {
+    text-align: center;
+    padding: 10px 105px 0px 105px;
+}
+
+#demoSpace {
+    display: inline-block !important;
+    width: 150px !important;
+}
+
+#application1, #application2 {
+    text-align: justify;
+}
+
+/*#placeAndDate {
+    text-align: left;
+}
+
+#signatureOfStudent, #signatureOfGuardian {
+    text-align: right;
+    padding: 0px !important;
+    margin-top: -35px;
+}*/
+#placeContainer, #dateAndSign {
+    text-align: left;
+}
+
+#signature {
+    text-align: right;
+}
+
+#tableSevenContainer {
+    padding: 0px !important;
+}
+
+#tableSeven {
+    border-top: hidden;
+    margin-bottom: 0px;
+    border-bottom: hidden;
+    border-left: hidden;
+    border-right: hidden;
+}
+
+#thDesignation {
+    border-left: hidden;
+}
+
+#thSignature {
+    border-right: hidden;
+}
+
+#remarkTableBody > tr :nth-child(1) {
+    border-left: hidden;
+}
+
+#remarkTableBody > tr :nth-child(3) {
+    border-right: hidden;
+}
+
+#secondContainer {
+    margin-top: 30px;
+}
+
+#admissionTitle {
+    text-align: center;
+    border: hidden;
+}
+
+#admissionRemark {
+    padding-top: 10px;
+    padding-left: 60px;
+    text-align: justify;
+    line-height: 35px;
+}
+
+    #admissionRemark > span {
+        display: block;
+    }
+
+#principal {
+    text-align: left;
+}
+
+table tbody{
+    text-align:center;
+    font-size : 13px;
+}
+
+#committeeSignature {
+    text-align: center;
+}
+
+#admissionCommittee {
+    border: hidden;
+}
+
+#principalAndCommittee :nth-child(1), #principalAndCommittee :nth-child(2) {
+    border: hidden;
+    padding-top: 5px;
+}
+
+#principalAndCommittee :nth-child(1) {
+    padding-left: 25px;
+}
+
+#principalAndCommittee {
+    padding-bottom: 15px;
+}
+
+#btnContainer {
+    text-align: center;
+    border: hidden;
+    padding: 25px;
+}
+
+    #btnContainer > .col-sm-12 {
+        border: hidden;
+    }
+
+#collegeCode {
+    text-align: center;
+    padding-top: 10px;
+}
+
+#registrationNo {
+    text-align: center;
+}
+
+#clgUse {
+    text-align: left;
+}
+
+#clgLogoContainer {
+    text-align: center !important;
+}
+
+
+
+/* page break */
+
+@media print {
+    #tableFiveContainer table thead #groupName {
+        background-color: #b3b3b3 !important;
+        -webkit-print-color-adjust: exact;
+    }
+}
+
+/*@media print {
+    body {
+        color-adjust: exact !important;
+    }
+
+    div {
+        page-break-inside: avoid;
+        margin: 0px 0px 0px 0px;
+    }
+
+    @page {*/
+        /* Chrome sets own margins, we change these printer settings */
+        /*margin: 30px 10mm 30px 10mm;
+    }
+}*/
+
+@media print {
+    body {
+        color-adjust: exact !important;
+    }
+
+    div {
+        page-break-before: avoid !important;
+        margin: 0px 0px 0px 0px;
+    }
+
+    @page {
+        /* Chrome sets own margins, we change these printer settings */
+        margin: 30px 10mm 30px 10mm;
+    }
+}
+
+#secondContainer {
+    border: 1px solid black;
+}
+
+/*#qulaifyingExamTable tr td:first-child:before {
+    counter-increment: Serial;
+    content: counter(Serial);
+}*/
+
+/*#docTable tr td:first-child:before {
+    counter-increment: Serial2;
+    content: counter(Serial2);
+}*/
+
+.create-table {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 1rem;
+}
+
+    .create-table td, .create-table tr, .create-table th {
+        padding: .75rem !important;
+    }
+
+.secTitle {
+    display: inline;
+    margin-left: 15px;
+}
+
+    .secTitle::before {
+        counter-increment: secCount;
+        content: counter(secCount) ".   ";
+    }
+
+[class^=col-]:not(#credentials) {
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+/* #courseApply{
+    border-top: hidden;
+    border-left: hidden;
+    border-right: hidden;
+}
+
+#admissionDate{
+    border-left: hidden;
+    border-right: hidden;
+} */
+
+ul > li {
+    text-decoration : none;
+    display : inline;
+}
+
+
+@media print {
+    .no-print, .no-print * {
+        visibility: hidden !important;
+    }
+
+    input {
+        visibility: hidden !important;
+    }
+}
+
+
+/*#remarkTitle, #fillSection, #principalAndCommittee {*/
+    /*margin-left : -15px !important;*/
+    /*margin-left: 0px !important;
+    margin-right: 0px !important
+}*/
+
+#parentSignature, #studentSignature, #dateContainer {
+    bottom: 0;
+    position: absolute;
+    display: block !important;
+    left: 0;
+    right: 0;
+}
+

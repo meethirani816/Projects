@@ -1,0 +1,76 @@
+# import datetime
+# import time
+# from playsound import playsound
+# import winsound # For Windows sound
+
+
+# def convert_to_24_hour_format(time_str):
+#     return datetime.datetime.strptime(time_str, "%I:%M %p").strftime("%H:%M")
+
+# def set_alarm(alarm_time_12hr, snooze=5):
+#     alarm_time_24hr = convert_to_24_hour_format(alarm_time_12hr)
+#     print(f"Alarm set for {alarm_time_12hr}")
+#     while True:
+#         current_time = datetime.datetime.now().strftime("%H:%M")
+#         if current_time == alarm_time_24hr:
+#             print("Time to wake up!")
+#             # winsound.Beep(2500,5000)
+#             playsound('clock-alarm.mp3')
+#             break
+#         time.sleep(1)
+
+# alarm_time = input("Enter the time for the alarm (HH:MM AM/PM): ")
+# set_alarm(alarm_time)
+
+# EXPLANATION
+'''
+Python Datetime module supplies classes to work with date and time. These classes provide several functions to deal with dates
+    times, and time intervals. Date and DateTime are an object in Python, so when you manipulate them, you are manipulating objects and not strings or timestamps. 
+
+The DateTime module is categorized into 6 main classes - 
+
+date - An idealized naive date, assuming the current Gregorian calendar always was, and always will be, in effect. 
+       Its attributes are year, month, and day. you can refer to - Python DateTime - Date Class
+
+time - An idealized time, independent of any particular day, assuming that every day has exactly 24*60*60 seconds. 
+       Its attributes are hour, minute, second, microsecond, and tzinfo.
+       You can refer to - Python DateTime - Time Class
+
+date-time - It is a combination of date and time along with the attributes year, month, day, hour, minute, second, microsecond,
+            and tzinfo. 
+            You can refer to - Python DateTime - DateTime Class
+
+timedelta - A duration expressing the difference between two date, time, or datetime instances to microsecond resolution.
+            You can refer to - Python DateTime - Timedelta Class
+
+tzinfo - It provides time zone information objects. You can refer to - Python - datetime.tzinfo()
+
+timezone - A class that implements the tzinfo abstract base class as a fixed offset from the UTC (New in version 3.2).
+           You can refer to - Handling timezone in Python
+%H - hour, using a 24-hour clock (00 to 23)
+%I - hour, using a 12-hour clock (01 to 12)
+%M - minute
+%p - either am or pm according to the given time value
+
+The 'strip()' method removes any leading, and trailing whitespaces.
+    Leading means at the beginning of the string, trailing means at the end.
+    You can specify which character(s) to remove, if not, any whitespaces will be removed.
+
+The 'playsound module' contains only a single function named 'playsound()'.
+    It requires one argument: the path to the file with the sound we have to play. It can be a local file, or a URL.
+    There's an optional second argument, block, which is set to True by default. 
+    We can set it to False for making the function run asynchronously.
+    It works with both WAV and MP3 files.
+
+The 'Strftime()' function is used to convert date and time objects to their string representation. 
+    It takes one or more inputs of formatted code and returns the string representation in Python.
+
+The Thread class represents an activity that is run in a separate thread of control. 
+    There are two ways to specify the activity: by passing a callable object to the constructor, or by overriding the run() method in a subclass. 
+    No other methods (except for the constructor) should be overridden in a subclass. 
+    In other words, only override the __init__() and run() methods of this class.
+
+    Once a thread object is created, its activity must be started by calling the thread's start() method. This invokes the run() method in a separate thread of control.
+    Other threads can call a thread's join() method. This blocks the calling thread until the thread whose join() method is called is terminated.
+
+'''

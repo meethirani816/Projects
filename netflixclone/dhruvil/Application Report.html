@@ -1,0 +1,2629 @@
+<!DOCTYPE html>
+<!-- saved from url=(0071)https://enrollonline.co.in/Student/ApplicationReport/Index?ReportType=1 -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=1024">
+    <title>Application Report</title>
+    <link rel="stylesheet" media="all" href="https://enrollonline.co.in/Student/ApplicationReport/Index?ReportType=1">
+    <link rel="stylesheet" href="./Application Report_files/bootstrap.min.css">
+    <link rel="stylesheet" href="./Application Report_files/ApplicationReport.css">
+    <script src="./Application Report_files/handlebars.js.download"></script>
+    <script src="./Application Report_files/jquery.min.js.download"></script>
+    <script src="./Application Report_files/jquery-1.12.4.min.js.download" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+    <script src="./Application Report_files/jspdf.min.1.3.5.js.download"></script>
+    <script src="./Application Report_files/html2pdf.bundle.min.js.download"></script>
+
+
+    <script>
+
+        $(document).ready(function () {
+            $(".loader-container").css("display", "block");
+            BindEvent();
+            $(".loader-container").fadeOut('slow');
+        });
+
+        function printForm(nameOfDiv) {
+
+            var printContent = document.getElementById(nameOfDiv).innerHTML;
+            var originalContent = document.body.innerHTML;
+
+            document.body.innerHTML = printContent;
+
+            window.print();
+            document.body.innerHTML = originalContent;
+        }
+
+        function createPDF() {
+            const element = document.getElementById("mainContainer");
+            element.style.counterReset = "secCount";
+            return new Promise(async (resolve, reject) => {
+                
+                let element = document.getElementById('mainContainer');
+
+                let opt = {
+                    margin: 0.2,
+                    filename: 'ApplicationReport.pdf',
+                    image: { type: 'jpeg', quality: 1 },
+                    html2canvas: { scale: 2.5, useCORS: true },
+                    jsPDF: { unit: 'in', format: 'A3', orientation: 'portrait' },
+                    watermark: {
+                        src: '../../../../Images/watermark.png',
+                        ratio: 0.5,
+
+                    },
+
+                    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                };
+
+                try {
+                    const blob = await window.html2pdf().set(opt).from(element).outputPdf('blob', 'ApplicationReport.pdf');
+                    resolve(blob);
+                    var file = new Blob([blob], { type: 'application/pdf' });
+                    var fileURL = URL.createObjectURL(file);
+                    var fileData = new FormData();
+                    fileData.append('docFileBase', file);
+                    $.ajax({
+                        url: '/ApplicationReport/SaveReportFile',
+                        type: "POST",
+                        contentType: false,
+                        processData: false,
+                        data: fileData,
+                        success: function (result) {
+
+                        },
+                        error: function (err) {
+
+                        }
+                    });
+
+                } catch (e) {
+                    reject(e);
+                }
+            });
+
+        }
+        function generatePDF() {
+            const element = document.getElementById("mainContainer");
+            
+            element.style.counterReset = "secCount";
+
+            var opt = {
+                margin: 0.2,
+                filename: 'Application Report.pdf',
+                image: { type: 'jpeg', quality: 1 },
+                html2canvas: { scale: 2.5 },
+                jsPDF: { unit: 'in', format: 'A3', orientation: 'portrait' },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+            };
+            element.style.counterReset = "secCount";
+            html2pdf().set(opt).from(element).save();
+        }
+
+        function backToCourse() {
+            window.history.go(-1);
+        }
+
+        var BindEvent = function () {
+            $.ajax({
+                url: "/ApplicationReport/GetApplicationReport",
+                type: "POST",
+                async: true,
+
+                success: function (data) {
+                    
+                    var context = JSON.parse(data);
+
+                    var template = $('#handlebars-demo').html();
+
+                    var templateScript = Handlebars.compile(template);
+
+                    Handlebars.registerHelper("getValue", function (val) {
+                        if (val === "NULL") {
+                            return " ";
+                        }
+
+                        return val;
+                    });
+
+                    Handlebars.registerHelper("today", function () {
+                        var today = new Date();
+                        var dd = String(today.getDate()).padStart(2, '0');
+                        var mm = String(today.getMonth() + 1).padStart(2, '0');
+                        var yyyy = today.getFullYear();
+                        today = dd + '/' + mm + '/' + yyyy;
+                        return today
+                    });
+
+                    Handlebars.registerHelper("inc", function (value, options) {
+                        return parseInt(value) + 1;
+                    });
+
+                    var html = templateScript(context);
+                    $(document.body).append(html);
+                    createPDF();
+                },
+            });
+        };
+
+        function ConvertDate(jSonDate) {
+            var dateString = jSonDate.substr(6);
+            var currentTime = new Date(parseInt(dateString));
+            var month = ('0' + (currentTime.getMonth() + 1)).slice(-2);
+            var day = ('0' + (currentTime.getDate())).slice(-2);
+            var year = currentTime.getFullYear();
+            var date = day + "/" + month + "/" + year;
+
+            return date;
+        };
+
+        function ConvertTime(jSonDate) {
+            var dateString = jSonDate.substr(6);
+            var currentTime = new Date(parseInt(dateString));
+            var hh = currentTime.getHours();
+            var mm = currentTime.getMinutes();
+            var ss = currentTime.getSeconds();
+            if (hh < 10) hh = '0' + hh;
+            if (mm < 10) mm = '0' + mm;
+            if (ss < 10) ss = '0' + ss;
+            var date;
+            if (hh >= 12) {
+                date = hh + ":" + mm + " PM";
+            } else {
+                date = hh + ":" + mm + " AM";
+            }
+            return date;
+        };
+    </script>
+
+    <style>
+        .loader-container {
+            background: #07253121;
+            top: 0;
+            left: 0;
+            z-index: 50;
+            width: 100%;
+            height: 100%;
+            position: fixed;
+        }
+
+        .load {
+            width: 100px;
+            height: 100px;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            margin: auto;
+        }
+
+        .gear {
+            position: absolute;
+            z-index: -10;
+            width: 40px;
+            height: 35px;
+            animation: spin 5s infinite;
+        }
+
+        .two {
+            left: 40px;
+            width: 50px;
+            height: 50px;
+            animation: spin-reverse 5s infinite;
+        }
+
+        .three {
+            top: 40px;
+            left: 18px;
+            width: 45px;
+            height: 45px;
+        }
+
+        @keyframes spin {
+            50% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes spin-reverse {
+            50% {
+                transform: rotate(-360deg);
+            }
+        }
+
+        .lil-circle {
+            position: absolute;
+            border-radius: 50%;
+            box-shadow: inset 0 0 10px 2px gray, 0 0 50px white;
+            width: 100px;
+            height: 100px;
+            opacity: 0.65;
+        }
+
+        .blur-circle {
+            position: absolute;
+            top: -19px;
+            left: -19px;
+        }
+
+        .secTitle {
+            font-size: 18px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="html-goes-here"></div>
+
+    <script id="handlebars-demo" type="text/x-handlebars-template">
+        <div class="row no-print" id="btnContainer">
+            <div class="col-sm-12">
+                    <button class="btn btn-outline-primary" onclick="backToCourse()">Back</button>
+            </div>
+
+        </div>
+
+        <div id="mainContainer">
+
+
+            <div class="container" id="firstContainer">
+                <div id="introduction">
+                    <div class="row">
+                        <div class="col-sm-12" id="clgLogoContainer">
+                            
+                            <img src="../../Images/KESJR_Header.png" class="img-fluid" />
+                            
+                        </div>
+                        <div class="col-sm-12" id="clgLogoContainer">
+                            <b>APPLICATION FORM</b>
+                        </div>
+                        <div class="col-sm-12" id="clgLogoContainer">
+                            <b>FOR OFFICE USE ONLY</b>
+                        </div>
+                        <div class="col-sm-4 text-left">
+                            <b>QUOTA:</b>
+                            <span id="collegeNameInput">
+                                {{#each studentRegistrationDetails}}
+                                {{CATEGORY}}
+                                {{/each}}
+                            </span>
+                        </div>
+                        <div class="col-sm-6 text-left">
+                            <b>RECEIEVER'S SIGN</b>
+                        </div>
+                        <div class="col-sm-2 text-left">
+                            <b>DATE :</b>
+                        </div>
+                        <div class="col-sm-5 text-left">
+                            <b>TRANSACTION NUMBER :</b>
+                        </div>
+                        <div class="col-sm-3 text-left">
+                            <b>Amount: </b>
+                        </div>
+                        <div class="col-sm-4 text-left">
+                            <b>SUBJECT COMBINATION : </b>
+                        </div>
+                        
+                    </div>
+                    
+                    <div id="credentials">
+                        <div class="row">
+                            
+                            <div class="col-sm-8">
+                                <div id="courseAndAdmissionDateContainer" class="row">
+                                    <div class="col-sm-12 border-top-0 border-left-0 border-right-0" id="courseApply">
+                                        <b>Course Applied For:</b> <span id="courseAppliedInput" style="text-transform:uppercase;">
+                                            {{#each studentRegistrationDetails}}
+                                            {{COURSENAME}}
+                                            {{/each}}
+                                        </span>
+                                    </div>
+                                    <div class="col-sm-12 border-bottom-0 border-right-0 border-left-0">
+                                        <b>Application No.:</b>
+                                        <span style="text-transform:uppercase;">
+                                            <b>
+                                                {{#each collegeDetails}}
+                                                {{ApplicationNo}}
+                                                {{/each}}
+
+                                            </b>
+                                        </span>
+                                    </div>
+                                    
+                                    <div clss="border" class="w-100"></div>
+                                    <div class="col-sm-12 border-left-0 border-right-0" id="admissionDate">
+                                        <b>Registration Date:</b> <span id="admissionDateInput">
+                                            {{#each studentRegistrationDetails}}
+                                            {{CREATE_DT}}
+                                            {{/each}}
+                                        </span>
+                                    </div>
+                                        <div class="col-sm-12 text-left border-left-0 border-right-0" id="registrationNo">
+                                            <b>
+                                                Registration No.
+                                            </b>
+                                            <span id="registrationNoInput">
+                                                <b>
+                                                    -
+                                                </b>
+                                            </span>
+                                        </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-2" id="signatureContainer">
+                                <img src="{{#each studentPhoto}}{{STUDENT_PHOTO_BLOB}}{{/each}}" alt="ProfilePhoto" class="img-fluid" />
+                            </div>
+
+                            <div class="col-sm-2" id="signatureContainer">
+                                <img src="{{#each studentPhoto}}{{STUDENT_SIGNATURE_BLOB}}{{/each}}" alt="SignaturePhoto" class="img-fluid">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--Section 1 - Personal Information Section -->
+
+                <div id="personalIntro">
+
+                    <div class="row">
+                        <div class="col-sm-12 border-left-0 border-right-0" id="personalInfoTitle">
+                            <b>
+                                <p class="secTitle">Personal information section</p>
+                            </b>
+                        </div>
+                    </div>
+
+                    <div class="row" id="nameInfo">
+                        <div class="col-sm-2">
+                            Title
+                        </div>
+                        <div class="col-sm-4">
+                            Last Name
+                        </div>
+                        <div class="col-sm-3">
+                            First Name
+                        </div>
+                        <div class="col-sm-3">
+                            Middle Name
+                        </div>
+                    </div>
+                    <!-- Student and father details -->
+                    <div class="row">
+                        <div class="col-sm-2">
+                            <span style="text-transform:uppercase;">
+                                {{#each studentRegistrationDetails}}
+                                {{Title}}
+                                {{/each}}
+                            </span>
+                        </div>
+                        <div class="col-sm-4">
+                            <span style="text-transform:uppercase;">
+                                {{#each studentRegistrationDetails}}
+                                {{STUDENT_LNAME}}
+                                {{/each}}
+                            </span>
+                        </div>
+                        <div class="col-sm-3">
+                            <span style="text-transform:uppercase;">
+                                {{#each studentRegistrationDetails}}
+                                {{STUDENT_FNAME}}
+                                {{/each}}
+                            </span>
+                        </div>
+                        <div class="col-sm-3">
+                            <span style="text-transform:uppercase;">
+                                {{#each studentRegistrationDetails}}
+                                {{STUDENT_MNAME}}
+                                {{/each}}
+                            </span>
+                        </div>
+
+                        <!-- Student's furthur details -->
+                        <div class="col-sm-12">
+                            <b>Name as per Aadhar :</b> <span id="nameasperadhar" style="text-transform:uppercase;">
+                                {{#each studentRegistrationDetails}}
+                                {{NameAsPerMarksheet}}
+                                {{/each}}
+                            </span>
+                        </div>
+                        <div class="col-sm-6">
+                            <b>Gender:</b> <span id="gender" style="text-transform:uppercase;">
+                                {{#each studentRegistrationDetails}}
+                                {{GENDERSTATUS}}
+                                {{/each}}
+                            </span>
+                        </div>
+                        <div class="col-sm-6">
+                            <b>Nationality: </b><span id="nationality" style="text-transform:uppercase;">
+                                {{#each studentRegistrationDetails}}
+                                {{Nationality}}
+                                {{/each}}
+                            </span>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <b>Date of Birth as per Leaving Certificate :</b> <span id="dob">
+                                {{#each studentRegistrationDetails}}
+                                {{DATE_OF_BIRTH}}
+                                {{/each}}
+                            </span>
+                        </div>
+                        <div class="col-sm-6">
+                            <b>Religion: </b><span id="religion" style="text-transform:uppercase;">
+                                {{#each studentRegistrationDetails}}
+                                {{RELIGION_NAME}}
+                                {{/each}}
+                            </span>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <b>Birth Place :</b> <span id="birthPlace" style="text-transform:uppercase;">
+                                {{#each studentRegistrationDetails}}
+                                {{PLACE_OF_BIRTH}}
+                                {{/each}}
+                            </span>
+                        </div>
+                        <div class="col-sm-6">
+                            <b>Aadhaar No.: </b><span id="religion" style="text-transform:uppercase;">
+                                {{#each studentRegistrationDetails}}
+                                {{AADHARCARDNO}}
+                                {{/each}}
+                            </span>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <b>Birth Country :</b> <span id="birthPlace" style="text-transform:uppercase;">
+                                {{#each studentRegistrationDetails}}
+                                {{BirthPCountry}}
+                                {{/each}}
+                            </span>
+                        </div>
+                        <div class="col-sm-6">
+                            <b>Sub Caste :</b> <span id="birthPlace" style="text-transform:uppercase;">
+                                {{#each studentRegistrationDetails}}
+                                {{SubCasteName}}
+                                {{/each}}
+                            </span>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <b>Birth / Domicile State :</b> <span id="birthState" style="text-transform:uppercase;">
+                                {{#each studentRegistrationDetails}}
+                                {{BirthPState}}
+                                {{/each}}
+                            </span>
+                        </div>
+                        <div class="col-sm-6">
+                            <b>Academic Bank of Credits : </b><span id="abcNo" style="text-transform:uppercase;">
+                                {{#each studentRegistrationDetails}}
+                                {{AcademicBankofCredits}}
+                                {{/each}}
+                            </span>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <b>Birth District :</b> <span id="birthDistrict" style="text-transform:uppercase;">
+                                {{#each studentRegistrationDetails}}
+                                {{BirthPDistrict}}
+                                {{/each}}
+                            </span>
+                        </div>
+                        <div class="col-sm-6">
+                            <b>University Pre Reg. No. : </b><span id="PreRegNo" style="text-transform:uppercase;">
+                                {{#each qualifyingExamDetails}}
+                                {{UniversityPreAdmRegNo}}
+                                {{/each}}
+                            </span>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <b>Marital Status : </b><span id="PreRegNo" style="text-transform:uppercase;">
+                                {{#each studentRegistrationDetails}}
+                                {{MERRIEDSTATUS}}
+                                {{/each}}
+                            </span>
+                        </div>
+                        <div class="col-sm-6">
+                            <b>No. of Attempts of Last qualifying Exam : </b><span id="lastQualifyAttempts" style="text-transform:uppercase;">
+                                {{#each studentRegistrationDetails}}
+                                {{NoofAttempt}}
+                                {{/each}}
+                            </span>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <b>Mother Tongue :</b> <span id="motherTongueInput" style="text-transform:uppercase;">
+                                {{#each studentRegistrationDetails}}
+                                {{MOTHERTOUNGE}}
+                                {{/each}}
+                            </span>
+                        </div>
+                        <div class="col-sm-6">
+                            <b>In-house (Studied in the same college/school) : </b><span id="inHouse" style="text-transform:uppercase;">
+                                {{#each studentRegistrationDetails}}
+                                {{InhouseStud}}
+                                {{/each}}
+                            </span>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <b>Blood group : </b><span id="inHouse" style="text-transform:uppercase;">
+                                {{#each studentRegistrationDetails}}
+                                {{BLOODGROUP}}
+                                {{/each}}
+                            </span>
+                        </div>
+                        <div class="col-sm-6">
+                            <b>Admission Category Type/ Linguistic Minority : </b><span id="inHouse" style="text-transform:uppercase;">
+                                {{#each studentRegistrationDetails}}
+                                {{CategoryType}}
+                                {{/each}}
+                            </span>
+                        </div>
+
+                    </div>
+
+                    <!-- Section 3 - Contact details -->
+                    <div id="contactContainer">
+                        <div class="row">
+                            <div class="col-sm-12 border-left-0 border-right-0" id="contactTitle">
+                                <b><p class="secTitle">Contact Details</p></b>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <b>Student Mobile No.: </b><span id="studentmobNo">
+                                    {{#each studentRegistrationDetails}}
+                                    {{STUDENT_MOB_NO}}
+                                    {{/each}}
+                                </span>
+                            </div>
+                            <div class="col-sm-6">
+                                <b>Student Email Id: </b><span id="emailId">
+                                    {{#each studentRegistrationDetails}}
+                                    {{EMAIL_ID}}
+                                    {{/each}}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--Guardian / Parent Information Section-->
+                    <div id="contactContainer">
+                        <div class="row">
+                            <div class="col-sm-12 border-left-0 border-right-0" id="contactTitle">
+                                <b><p class="secTitle">Parent's Details</p></b>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <b>Father's Name : </b><span id="fatherName">
+                                    {{#each studentRegistrationDetails}}
+                                    {{FatherName}}
+                                    {{/each}}
+                                </span>
+                            </div>
+                            <div class="col-sm-6">
+                                <b>Mother's Name : </b><span id="fathermobNo">
+                                    {{#each studentRegistrationDetails}}
+                                    {{MOTHER_NAME}}
+                                    {{/each}}
+                                </span>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <b>Father Mobile No : </b><span id="fathermobNo">
+                                    {{#each studentRegistrationDetails}}
+                                    {{FatherMobileNo}}
+                                    {{/each}}
+                                </span>
+                            </div>
+                            <div class="col-sm-6">
+                                <b>Mother Mobile No : </b><span id="fatherOccupation">
+                                    {{#each studentRegistrationDetails}}
+                                    {{MotherMobileNo1}}
+                                    {{/each}}
+                                </span>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <b>Father's Email : </b><span id="fatherOccupation">
+                                    {{#each studentRegistrationDetails}}
+                                    {{FatherEmailID}}
+                                    {{/each}}
+                                </span>
+                            </div>
+                            <div class="col-sm-6">
+                                <b>Mother's Email : </b><span id="fatherOccupation">
+                                    {{#each studentRegistrationDetails}}
+                                    {{MotherEMailID1}}
+                                    {{/each}}
+                                </span>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <b>Father's Occupation : </b><span id="fatherOccupation">
+                                    {{#each studentRegistrationDetails}}
+                                    {{FatherOccupation}}
+                                    {{/each}}
+                                </span>
+                            </div>
+                            <div class="col-sm-6">
+                                <b>Mother's Occupation : </b><span id="fatherName">
+                                    {{#each studentRegistrationDetails}}
+                                    {{MotherOccupationName}}
+                                    {{/each}}
+                                </span>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <b>Family Income : </b><span id="fathermobNo">
+                                    {{#each studentRegistrationDetails}}
+                                    {{PARENTINCOME}}
+                                    {{/each}}
+                                </span>
+                            </div>
+                            <div class="col-sm-6">
+                                <b>Parents Office Address : </b><span id="fatherOccupation">
+                                    {{#each studentRegistrationDetails}}
+                                    {{FatherOrganisationAddress}}
+                                    {{/each}}
+                                </span>
+                            </div>
+
+                            <div class="col-sm-12">
+                                <b>Total Family Members : </b><span id="fatherName">
+                                    {{#each studentRegistrationDetails}}
+                                    {{TotalFamilyMember}}
+                                    {{/each}}
+                                </span>
+                            </div>
+                        </div>
+                        <!--<div class="row">
+                            <div class="col-sm-4">
+                                <b>Father's Name : </b><span id="fatherName">
+                                    {{#each studentRegistrationDetails}}
+                                    {{FatherName}}
+                                    {{/each}}
+                                </span>
+                            </div>
+                            <div class="col-sm-4">
+                                <b>Father Mobile No : </b><span id="fathermobNo">
+                                    {{#each studentRegistrationDetails}}
+                                    {{FatherMobileNo}}
+                                    {{/each}}
+                                </span>
+                            </div>
+                            <div class="col-sm-4">
+                                <b>Father's Occupation : </b><span id="fatherOccupation">
+                                    {{#each studentRegistrationDetails}}
+                                    {{FatherOccupation}}
+                                    {{/each}}
+                                </span>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <b>Total Family Members : </b><span id="fatherName">
+                                    {{#each studentRegistrationDetails}}
+                                    {{TotalFamilyMember}}
+                                    {{/each}}
+                                </span>
+                            </div>
+                            <div class="col-sm-6">
+                                <b>Annual Income of the Family : </b><span id="fathermobNo">
+                                    {{#each studentRegistrationDetails}}
+                                    {{PARENTINCOME}}
+                                    {{/each}}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <b>Mother's Name : </b><span id="fathermobNo">
+                                    {{#each studentRegistrationDetails}}
+                                    {{MOTHER_NAME}}
+                                    {{/each}}
+                                </span>
+                            </div>
+                            <div class="col-sm-4">
+                                <b>Mother Mobile No : </b><span id="fatherOccupation">
+                                    {{#each studentRegistrationDetails}}
+                                    {{MotherMobileNo}}
+                                    {{/each}}
+                                </span>
+                            </div>
+                            <div class="col-sm-4">
+                                <b>Mother's Email : </b><span id="fatherOccupation">
+                                    {{#each studentRegistrationDetails}}
+                                    {{MotherEmailId}}
+                                    {{/each}}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <b>Mother's Occupation : </b><span id="fatherName">
+                                    {{#each studentRegistrationDetails}}
+                                    {{MotherOccupationName}}
+                                    {{/each}}
+                                </span>
+                            </div>-->
+                        
+                        <!--<div class="col-sm-6">
+                        <b>Parents Office Address : </b><span id="fatherOccupation">-->
+                        
+                        <!--</span>
+                            </div>
+                        </div>-->
+                        
+
+                    </div>
+
+                    <div id="contactContainer">
+                        <div class="row">
+                            <div class="col-sm-12 border-left-0 border-right-0" id="contactTitle">
+                                <b><p class="secTitle">Guardian Information Section</p></b>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <b>Guardian's Name : </b><span id="fatherOccupation">
+                                    {{#each studentRegistrationDetails}}
+                                    {{GUARDIAN_NAME}}
+                                    {{/each}}
+                                </span>
+                            </div>
+                            <div class="col-sm-12">
+                                <b>Guardian's/Parent's Contact No. : </b><span id="fatherName">
+                                    {{#each studentRegistrationDetails}}
+                                    {{GuardianContactNo}}
+                                    {{/each}}
+                                </span>
+                            </div>
+                            <div class="col-sm-12">
+                                <b>Relation With Applicant : </b><span id="fathermobNo">
+                                    {{#each studentRegistrationDetails}}
+                                    {{RELATIONWITHAPPLICANT}}
+                                    {{/each}}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <!-- section 2 - Address Details -->
+                    <div id="addressDetails">
+                        <div class="row">
+                            <div class="col-sm-12 border-left-0 border-right-0" id="addressTitle">
+                                <b><p class="secTitle">Address Details</p></b>
+                            </div>
+                        </div>
+
+                        <div class="row" id="addressContainer">
+                            <div class="col-sm-3">
+                                <b>Address of Correspondence: </b>
+                            </div>
+                            <div class="col-sm-6">
+                                
+                                <span id="addressField" style="text-transform:uppercase;">
+                                    {{#each studentRegistrationDetails}}
+                                    {{LOCAL_ADDRESS}}
+                                    {{/each}}
+                                </span>
+                            </div>
+                            <div class="col-sm-3">
+                                <b>PIN Code :</b>
+                                <span id="city" style="text-transform:uppercase;">
+                                    {{#each studentRegistrationDetails}}
+                                    {{LOCAL_PIN_CODE}}
+                                    {{/each}}
+                                </span>
+                            </div>
+                            <div class="col-sm-3">
+                                <b>Country  :</b>
+                                <span id="country" style="text-transform:uppercase;">
+                                    {{#each studentRegistrationDetails}}
+                                    {{LOCAL_COUNTRY_NAME}}
+                                    {{/each}}
+                                </span>
+                            </div>
+                            <div class="col-sm-3">
+                                <b>State :</b>
+                                <span id="state" style="text-transform:uppercase;">
+                                    {{#each studentRegistrationDetails}}
+                                    {{LOCAL_STATE_NAME}}
+                                    {{/each}}
+                                </span>
+                            </div>
+                            <div class="col-sm-3">
+                                <b>District :</b>
+                                <span id="district" style="text-transform:uppercase;">
+                                    {{#each studentRegistrationDetails}}
+                                    {{LOCAL_DIST_NAME}}
+                                    {{/each}}
+                                </span>
+                            </div>
+                            <div class="col-sm-3">
+                                <b>City/Village :</b>
+                                <span id="city" style="text-transform:uppercase;">
+                                    {{#each studentRegistrationDetails}}
+                                    {{LOCAL_CITY_NAME}}
+                                    {{/each}}
+                                </span>
+                            </div>
+
+                            <div class="col-sm-3">
+                                <b>Permanent Address :</b>
+                            </div>
+                            <div class="col-sm-6">
+                                <span id="permanentAdd" style="text-transform:uppercase;">
+                                    {{#each studentRegistrationDetails}}
+                                    {{PERMANENT_ADDRESS}}
+                                    {{/each}}
+                                </span>
+                            </div>
+                            <div class="col-sm-3">
+                                <b>PIN Code :</b>
+                                <span id="city" style="text-transform:uppercase;">
+                                    {{#each studentRegistrationDetails}}
+                                    {{PERMANENT_PIN_CODE}}
+                                    {{/each}}
+                                </span>
+                            </div>
+                            <div class="col-sm-3">
+                                <b>Country : </b><span id="pCountry" style="text-transform:uppercase;">
+                                    {{#each studentRegistrationDetails}}
+                                    {{PERMANENT_COUNTRY_NAME}}
+                                    {{/each}}
+                                </span>
+                            </div>
+                            <div class="col-sm-3">
+                                <b>State :</b><span id="pCountry" style="text-transform:uppercase;">
+                                    {{#each studentRegistrationDetails}}
+                                    {{PERMANENT_COUNTRY_NAME}}
+                                    {{/each}}
+                                </span>
+                            </div>
+                            <div class="col-sm-3">
+                                <b>District: </b><span id="district2" style="text-transform:uppercase;">
+                                    {{#each studentRegistrationDetails}}
+                                    {{PERMANENT_DIST_NAME}}
+                                    {{/each}}
+                                </span>
+                            </div>
+                            <div class="col-sm-3">
+                                <b>City/Village: </b><span id="city2" style="text-transform:uppercase;">
+                                    {{#each studentRegistrationDetails}}
+                                    {{PERMANENT_CITY_NAME}}
+                                    {{/each}}
+                                </span>
+                            </div>
+
+
+
+
+                        </div>
+                    </div>
+
+
+                    <!-- Section 4 -  Legal Reservation Information Section -->
+                    <div id="legalReservationInfo">
+                        <div class="row">
+                            <div class="col-sm-12 border-left-0 border-right-0" id="reservationTitle">
+                                <b><p class="secTitle">Legal Reservation Information Section</p></b>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <b>Caste Category: </b><span id="casteCategory" style="text-transform:uppercase;">
+                                    {{#each studentRegistrationDetails}}
+                                    {{CATEGORY}}
+                                    {{/each}}
+                                </span>
+                            </div>
+                            <div class="col-sm-6">
+                                <b> Admission Category Type/ Linguistic Minority: </b><span id="casteCategory" style="text-transform:uppercase;">
+                                    {{#each studentRegistrationDetails}}
+                                    {{CategoryType}}
+                                    {{/each}}
+                                </span>
+                            </div>
+                            <div class="col-sm-6">
+                                <b>Phy. Handicapped: </b><span id="handicapped" style="text-transform:uppercase;">
+                                    {{#each studentRegistrationDetails}}
+                                    {{PHYSICAL_HANDICAPPED}}
+                                    {{/each}}
+                                </span>
+                            </div>
+                            <div class="col-sm-6">
+                                <b>Learning Disability No.: </b><span id="learningDisabilityNo">
+                                    {{#each studentRegistrationDetails}}
+                                    {{LearningDisabilityNo}}
+                                    {{/each}}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- section 5 - Social reservation (special category) inforation section -->
+                    <div id="socialReservation">
+                        <div class="row">
+                            <div class="col-sm-12 border-0" id="socialReservationTitle">
+                                <b><p class="secTitle">Social Reservation (Special Category) Information Section</p></b>
+                                <table class="table table-bordered" id="socialReservationtable">
+                                    <thead>
+                                        <tr>
+                                            <th width="10%" scope="col">SR No.</th>
+                                            <th scope="col">SOCIAL RESERVATION NAME</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {{#each registrationDetailsSocialRes }}
+                                        <tr>
+                                            <td width="10%">{{inc @index}}</td>
+                                            <td>
+                                                <span id="tableOneContent" style="text-transform:uppercase;">
+
+                                                    {{SocReservationName}}
+
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        {{/each}}
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- section 6 -  Education Details Section  -->
+                    <div id="educationDetails">
+                        <div class="row">
+                            <div class="col-sm-12 border-0" id="educationDetailTitle">
+                                <b><p class="secTitle">Education Details Section </p></b>
+                                <table class="table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th class="col-sm-2">Exam Name </th>
+                                            <th class="col-sm-2">Board/University</th>
+                                            <th class="col-sm-2">school/College</th>
+                                            <th class="col-sm-1">year of Passing</th>
+                                            <th class="col-sm-1">Exam Seat Number</th>
+                                            <th class="col-sm-1">Obtained Marks</th>
+                                            <th class="col-sm-1">Total Marks</th>
+                                            <th class="col-sm-1">Percentage</th>
+                                            <th class="col-sm-1">Month of Passing</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {{#each educationDetail}}
+                                        <tr style="text-transform:uppercase;">
+                                            <td class="col-sm-2">
+                                                {{QUALIFYING_EXAM}}
+                                            </td>
+                                            <td class="col-sm-2">
+                                                {{QUALIFYING_BOARD_UNIVERSITY}}
+                                            </td>
+                                            <td class="col-sm-2">
+                                                {{QUALIFYING_COLLEGE_ATTENDED}}
+                                            </td>
+                                            <td class="col-sm-1">
+                                                {{Year}}
+                                            </td>
+                                            <td class="col-sm-1">
+                                                {{LAST_EXAM_SEATNO}}
+                                            </td>
+                                            <td class="col-sm-1">
+                                                {{QUALIFYING_MARKS_OBTAINED}}
+                                            </td>
+                                            <td class="col-sm-1">
+                                                {{QUALIFYING_TOTAL_MARKS}}
+                                            </td>
+                                            <td class="col-sm-1">
+                                                {{QUALIFYING_PERCENTAGE}}
+                                            </td>
+                                            <td class="col-sm-1">
+                                                {{Month}}
+                                            </td>
+                                        </tr>
+                                        {{/each}}
+
+
+                                    </tbody>
+
+                                </table>
+
+                                
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- section 7 - Qualifying Exam Details Section  -->
+                    <div id="qualifyingExamDetails">
+                        <div class="row">
+                            <div class="col-sm-12 border-0" id="qualifyingExamTitle">
+                                <b><p class="secTitle">Qualifying Exam Details Section</p></b>
+                                <br>
+                                <span id="subHeading" style="text-transform:uppercase;">
+                                    <b>
+                                        Qualifying Exam Name: {{#each qualifyingExamDetails}}{{qualifyingExamName}}{{/each}}
+                                    </b>
+                                </span>
+                                <table class="table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>College/School Attended</th>
+                                            <th>Board/university</th>
+                                            <th>Place</th>
+                                            <th>Last Exam Roll No</th>
+                                            <th>Obtained Marks</th>
+                                            <th>Total Marks</th>
+                                            <th>Percentage</th>
+                                            <th>Year Of Passing</th>
+                                            <th>Stream</th>
+                                            <th>Month of Passing</th>
+                                            <th>Education Gap</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        <tr style="text-transform:uppercase;">
+                                            <td>
+                                                {{#each qualifyingExamDetails}}
+                                                {{CollegeAttended}}
+                                                {{/each}}
+                                            </td>
+                                            <td>
+                                                {{#each qualifyingExamDetails}}
+                                                {{Board}}
+                                                {{/each}}
+                                            </td>
+                                            <td>
+                                                {{#each qualifyingExamDetails}}
+                                                {{QualExamPlace}}
+                                                {{/each}}
+                                            </td>
+                                            <td>
+                                                {{#each qualifyingExamDetails}}
+                                                {{QualExamSeatNo}}
+                                                {{/each}}
+                                            </td>
+                                            <td>
+                                                {{#each qualifyingExamDetails}}
+                                                {{MarksObtained}}
+                                                {{/each}}
+                                            </td>
+                                            <td>
+                                                {{#each qualifyingExamDetails}}
+                                                {{TotalMarks}}
+                                                {{/each}}
+                                            </td>
+                                            <td>
+                                                {{#each qualifyingExamDetails}}
+                                                {{Percentatge}}
+                                                {{/each}}
+                                            </td>
+                                            <td>
+                                                {{#each qualifyingExamDetails}}
+                                                {{PassingYear}}
+                                                {{/each}}
+                                            </td>
+                                            <td>
+                                                {{#each qualifyingExamDetails}}
+                                                {{QualExamStreame}}
+                                                {{/each}}
+                                            </td>
+                                            <td>
+                                                {{#each qualifyingExamDetails}}
+                                                {{Month}}
+                                                {{/each}}
+                                            </td>
+                                            <td>
+                                                {{#each qualifyingExamDetails}}
+                                                {{EduGap}}
+                                                {{/each}}
+                                            </td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+
+
+                                <table class="table table-bordered" id="qulaifyingExamTable">
+                                    <thead>
+                                        <tr>
+                                            <th colspan="4">
+                                                Qualifying Exam Subject Details
+                                            </th>
+                                        </tr>
+                                        <tr>
+                                            <th width="10%">
+                                                Sr. No.
+                                            </th>
+                                            <th>
+                                                Subject Name
+                                            </th>
+                                            <th>
+                                                Total Marks
+                                            </th>
+                                            <th>
+                                                Obtained Marks
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        {{#each lastQualifyingExamDetails}}
+                                        <tr class="text-center" style="text-transform:uppercase;">
+                                            <td width="10%">{{inc @index}}</td>
+                                            <td>{{SubjectName}}</td>
+                                            <td>{{TotalMarks}}</td>
+                                            <td>{{ObtainedMarks}}</td>
+                                        </tr>
+                                        {{/each}}
+
+                                        
+                                    </tbody>
+                                </table>
+
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 8 - Subject Details Section  -->
+                    <div id="subjectDetailsSection">
+                        <div class="row">
+                            <div class="col-sm-12 border-0" id="subjectSectionTitle">
+
+                                <p class="secTitle"><b> Subject Details Section</b></p>
+
+                                <table id="subDetailsTable" class="create-table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="10%">Sr. No.</th>
+                                            <th id="GroupName">Group Name</th>
+                                            <th>Subject Name</th>
+                                        </tr>
+                                        
+                                    </thead>
+                                    <tbody>
+                                        {{#each studSubLangDetails3}}
+                                        <tr class="text-center" style="text-transform:uppercase;">
+                                            <td width="10%">{{inc @index}}</td>
+                                            <td id="groupNameInput">
+                                                {{GroupName}}
+                                            </td>
+                                            <td>
+                                                {{SubjectName}}
+                                            </td>
+                                            
+                                        </tr>
+                                        {{/each}}
+
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 9 - Attached Documents -->
+                    <div class="attachedDocsContainer">
+                        <div class="row">
+                            <div class="col-sm-12 border-0" id="attachedDocsTitle">
+                                <b>
+                                    <p class="secTitle">Attached Documents</p>
+                                </b>
+                                <div id="tableSixContainer" class="table-responsive">
+                                    <table class="table table-bordered" id="docTable">
+                                        <thead>
+                                            <tr>
+                                                <th width="10%">Sr No.</th>
+                                                <th>Name of Documents/Certificate</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                            {{#each studCertificateDetails}}
+                                            <tr style="text-transform:uppercase;">
+                                                <td width="5%" class="text-center">{{inc @index}}</td>
+                                                <td>
+                                                    {{CertificateName}}
+                                                </td>
+                                            </tr>
+                                            {{/each}}
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div><br /><br />
+                        <div style="page-break-after:always;"></div>
+                        <div class="attachedDocsContainer" style="border: solid 1px black; padding: 22px; page-break-after: always;">
+                            <div class="row text-center">
+                                
+                                <br /><br />
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12 border-0">
+                                    I am aware that –<br />
+                                    And I promise to remit the applicable fees. I give below all the particulars required.<br />
+                                    - I will not be allowed to appear for the final examination if my attendance is less than 75% of lectures derived in each term separately as per Maharashtra State Board & Higher Secondary Education’s Rules & Regulation No. 88 (1).<br />
+                                    - Wearing of Identity card is compulsory throughout the stay in campus.<br />
+                                    - Use of mobile phone is strictly prohibited in the college campus and if found using it, will lead to confiscation of the same for a year.<br />
+                                    - I will follow the dress code specified by the college.<br />
+                                    - If I damage the college property then disciplinary action will be taken against me.<br>
+                                    - Possession of a mobile phone in the Examination Hall / block will be treated as unfair means and will be punished accordingly.<br>
+                                    - There will be hybrid mode of lecture i.e. online as well as offline also.
+                                </div>
+                            </div>
+                            <br /><br /><br />
+                            <div class="row text-center">
+                                <div class="col-sm-12 text-center border-0"><b>UNDERTAKING</b></div>
+                                <br /><br />
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12 border-0">I further declare that I will abide by all the rules and the regulations of College / University of Mumbai.</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12 text-right border-0">
+                                    <img src="data:image/png;base64,{{#each studentPhoto}}{{STUDENT_SIGNATURE}}{{/each}}" alt="SignaturePhoto" class="img-fluid" width="160px" height="80px" style="margin-bottom:10px !important;"><br />
+                                    <b>SIGNATURE OF THE STUDENT</b>
+                                </div>
+                            </div><br /><br />
+
+                            <div class="row text-center">
+                                <div class="col-sm-12 text-center border-0"><b>PERMISSION FROM PARENTS / GUARDIAN</b></div>
+                                <br /><br /><br />
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12 border-0">I have permitted my son / Daughter / Ward to join the college and I shall ensure that he / she attends classes regularly and observes the above mentioned rules.</div>
+                            </div>
+                            <div class="row text-right">
+                                <div class="col-sm-12 text-right border-0">
+                                    <img src="data:image/png;base64,{{#each studentPhoto}}{{Parent_Signature}}{{/each}}" alt="SignaturePhoto" class="img-fluid" width="160px" height="80px" style="margin-bottom:10px !important;"><br />
+                                    <b>SIGNATURE OF THE PARENT / GUARDIAN </b>
+                                </div>
+                            </div><br /><br />
+
+                            <div class="row">
+                                <div class="col-sm-12 text-left border-0">
+                                    <b>Attachments to be submitted along with the application</b><br />
+                                    - Admission Form.<br />
+                                    - Transaction Successful Receipt.<br>
+                                    - Xerox copy of 10th Marksheet.<br>
+                                    - Fees Challan.<br>
+                                    - Leaving Certificate and NOC (For taking admission in FYJC)<br>
+                                    - Copy of Aadhar Card.<br>
+                                    - Cancelled Cheque of their bank account.
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <br />
+                    <!-- Section 14 - For College/institute Use Only -->
+                    <div id="collegeUseOnly">
+                        <div class="row">
+                            <div class="col-sm-12" id="forCollegeTitle">
+                                <b>
+                                    <p class="secTitle">For College / Institute Use Only</p>
+                                </b>
+                            </div>
+
+                            
+
+                            <div class="col-sm-12" id="tableSevenContainer">
+                                <div>
+                                    <table class="table table-bordered" id="tableSeven">
+                                        <thead>
+                                            <tr>
+                                                <th id="thDesignation">
+                                                    Designation
+                                                </th>
+                                                <th>
+                                                    Remarks / Particular / Recommendation
+                                                </th>
+                                                <th id="thSignature">
+                                                    Signature and Date
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="remarkTableBody">
+                                            <tr>
+                                                <td>
+                                                    Admission Clerk
+                                                </td>
+                                                <td>
+                                                    <span id="remarkOneInput">
+
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span id="signatureOneInput">
+
+                                                    </span>
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>
+                                                    Admission Committee
+                                                </td>
+                                                <td>
+                                                    <span id="remarkTwoInput">
+
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span id="signatureTwoInput">
+
+                                                    </span>
+                                                </td>
+                                            </tr>
+
+
+                                            <tr>
+                                                <td>
+                                                    Accountant / cashier
+                                                </td>
+                                                <td>
+                                                    <span id="remarkthreeInput">
+
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span id="signatureThreeInput">
+
+                                                    </span>
+                                                </td>
+                                            </tr>
+
+
+                                            <tr>
+                                                <td>
+                                                    <span>
+                                                        Registrar/Office
+                                                        superintendent
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <div class="row">
+                                                        <div class="col-sm-12 border-0">
+                                                            <span id="remarkFourInput">
+                                                                Cash Received : {{#each studentRegistrationDetails}}{{Amount}}{{/each}}
+                                                            </span>
+                                                        </div>
+
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span id="signatureFourInput">
+
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <!-- Main Container 2 -->
+                <div class="container" id="secondContainer">
+                    <div class="row" id="remarkTitle">
+                        <div class="col-sm-12 center" id="admissionTitle">
+                            <b>
+                                REMARK OF THE ADMISSION COMMITTEE
+                            </b>
+                        </div>
+                    </div>
+                    <div class="row" id="fillSection">
+                        <div class="col-sm-12" id="admissionCommittee">
+                            <div id="admissionRemark">
+                                <p>
+                                    May be admitted to Class__________________________________________________________________
+                                    Section___________________________
+                                </p>
+                                <p>
+                                    May be
+                                    Rejected_______________________________________________________________________________________________________________
+                                </p>
+                                <p>
+                                    Last date of payment of
+                                    fees___________________________________________________________________________________________________
+                                </p>
+
+                                <p>Admission may be cancelled if the fees are not paid by this date.</p>
+                            </div>
+
+                            <div class="row" id="principalAndCommittee">
+                                <div class="col-sm-6 ">
+                                    <div class="text-left" style="padding-left:50px;">
+                                        
+                                        Principal
+                                        <br />
+                                        <br />
+                                        Date: 
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div id="committeeSignature">
+                                        <span>
+                                            Signature of Admission Committee
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-12 border-0 text-right">
+                            <span style="font-size:12px;">Print Date : {{today}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+    </script>
+    <div class="loader-container" style="display: none;">
+        <div class="load">
+            <div class="gear one">
+                <svg id="blue" viewBox="0 0 100 100" fill="#94DDFF">
+                    <path d="M97.6,55.7V44.3l-13.6-2.9c-0.8-3.3-2.1-6.4-3.9-9.3l7.6-11.7l-8-8L67.9,20c-2.9-1.7-6-3.1-9.3-3.9L55.7,2.4H44.3l-2.9,13.6      c-3.3,0.8-6.4,2.1-9.3,3.9l-11.7-7.6l-8,8L20,32.1c-1.7,2.9-3.1,6-3.9,9.3L2.4,44.3v11.4l13.6,2.9c0.8,3.3,2.1,6.4,3.9,9.3      l-7.6,11.7l8,8L32.1,80c2.9,1.7,6,3.1,9.3,3.9l2.9,13.6h11.4l2.9-13.6c3.3-0.8,6.4-2.1,9.3-3.9l11.7,7.6l8-8L80,67.9      c1.7-2.9,3.1-6,3.9-9.3L97.6,55.7z M50,65.6c-8.7,0-15.6-7-15.6-15.6s7-15.6,15.6-15.6s15.6,7,15.6,15.6S58.7,65.6,50,65.6z">
+                    </path>
+                </svg>
+            </div>
+            <div class="gear two">
+                <svg id="pink" viewBox="0 0 100 100" fill="#FB8BB9">
+                    <path d="M97.6,55.7V44.3l-13.6-2.9c-0.8-3.3-2.1-6.4-3.9-9.3l7.6-11.7l-8-8L67.9,20c-2.9-1.7-6-3.1-9.3-3.9L55.7,2.4H44.3l-2.9,13.6      c-3.3,0.8-6.4,2.1-9.3,3.9l-11.7-7.6l-8,8L20,32.1c-1.7,2.9-3.1,6-3.9,9.3L2.4,44.3v11.4l13.6,2.9c0.8,3.3,2.1,6.4,3.9,9.3      l-7.6,11.7l8,8L32.1,80c2.9,1.7,6,3.1,9.3,3.9l2.9,13.6h11.4l2.9-13.6c3.3-0.8,6.4-2.1,9.3-3.9l11.7,7.6l8-8L80,67.9      c1.7-2.9,3.1-6,3.9-9.3L97.6,55.7z M50,65.6c-8.7,0-15.6-7-15.6-15.6s7-15.6,15.6-15.6s15.6,7,15.6,15.6S58.7,65.6,50,65.6z">
+                    </path>
+                </svg>
+            </div>
+            <div class="gear three">
+                <svg id="yellow" viewBox="0 0 100 100" fill="#FFCD5C">
+                    <path d="M97.6,55.7V44.3l-13.6-2.9c-0.8-3.3-2.1-6.4-3.9-9.3l7.6-11.7l-8-8L67.9,20c-2.9-1.7-6-3.1-9.3-3.9L55.7,2.4H44.3l-2.9,13.6      c-3.3,0.8-6.4,2.1-9.3,3.9l-11.7-7.6l-8,8L20,32.1c-1.7,2.9-3.1,6-3.9,9.3L2.4,44.3v11.4l13.6,2.9c0.8,3.3,2.1,6.4,3.9,9.3      l-7.6,11.7l8,8L32.1,80c2.9,1.7,6,3.1,9.3,3.9l2.9,13.6h11.4l2.9-13.6c3.3-0.8,6.4-2.1,9.3-3.9l11.7,7.6l8-8L80,67.9      c1.7-2.9,3.1-6,3.9-9.3L97.6,55.7z M50,65.6c-8.7,0-15.6-7-15.6-15.6s7-15.6,15.6-15.6s15.6,7,15.6,15.6S58.7,65.6,50,65.6z">
+                    </path>
+                </svg>
+            </div>
+            
+            <svg class="blur-circle">
+                <filter id="blur">
+                    <fegaussianblur in="SourceGraphic" stdDeviation="13"></fegaussianblur>
+                </filter>
+                
+            </svg>
+        </div>
+    </div>
+
+
+<script>
+      $(document).ready(function () {
+            setTimeout(function () {
+
+                var ReportType = '1'
+                if (parseInt(ReportType) == 1) {
+                    $('.container').css('background-image',
+                        'url(../../../../Images/watermark.png)');
+                }
+            }, 3000);
+        });
+</script>
+
+        <div class="row no-print" id="btnContainer">
+            <div class="col-sm-12">
+                    <button class="btn btn-outline-primary" onclick="backToCourse()">Back</button>
+            </div>
+
+        </div>
+
+        <div id="mainContainer" style="counter-reset: secCount 0;">
+
+
+            <div class="container" id="firstContainer" style="background-image: url(&quot;../../../../Images/watermark.png&quot;);">
+                <div id="introduction">
+                    <div class="row">
+                        <div class="col-sm-12" id="clgLogoContainer">
+                            
+                            <img src="./Application Report_files/KESJR_Header.png" class="img-fluid">
+                            
+                        </div>
+                        <div class="col-sm-12" id="clgLogoContainer">
+                            <b>APPLICATION FORM</b>
+                        </div>
+                        <div class="col-sm-12" id="clgLogoContainer">
+                            <b>FOR OFFICE USE ONLY</b>
+                        </div>
+                        <div class="col-sm-4 text-left">
+                            <b>QUOTA:</b>
+                            <span id="collegeNameInput">
+                                OPEN
+                            </span>
+                        </div>
+                        <div class="col-sm-6 text-left">
+                            <b>RECEIEVER'S SIGN</b>
+                        </div>
+                        <div class="col-sm-2 text-left">
+                            <b>DATE :</b>
+                        </div>
+                        <div class="col-sm-5 text-left">
+                            <b>TRANSACTION NUMBER :</b>
+                        </div>
+                        <div class="col-sm-3 text-left">
+                            <b>Amount: </b>
+                        </div>
+                        <div class="col-sm-4 text-left">
+                            <b>SUBJECT COMBINATION : </b>
+                        </div>
+                        
+                    </div>
+                    
+                    <div id="credentials">
+                        <div class="row">
+                            
+                            <div class="col-sm-8">
+                                <div id="courseAndAdmissionDateContainer" class="row">
+                                    <div class="col-sm-12 border-top-0 border-left-0 border-right-0" id="courseApply">
+                                        <b>Course Applied For:</b> <span id="courseAppliedInput" style="text-transform:uppercase;">
+                                            F.Y.J.C (11TH) COMMERCE UNAIDED
+                                        </span>
+                                    </div>
+                                    <div class="col-sm-12 border-bottom-0 border-right-0 border-left-0">
+                                        <b>Application No.:</b>
+                                        <span style="text-transform:uppercase;">
+                                            <b>
+                                                11COM-UA/24-25/213
+
+                                            </b>
+                                        </span>
+                                    </div>
+                                    
+                                    <div clss="border" class="w-100"></div>
+                                    <div class="col-sm-12 border-left-0 border-right-0" id="admissionDate">
+                                        <b>Registration Date:</b> <span id="admissionDateInput">
+                                            10/06/2024
+                                        </span>
+                                    </div>
+                                        <div class="col-sm-12 text-left border-left-0 border-right-0" id="registrationNo">
+                                            <b>
+                                                Registration No.
+                                            </b>
+                                            <span id="registrationNoInput">
+                                                <b>
+                                                    -
+                                                </b>
+                                            </span>
+                                        </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-2" id="signatureContainer">
+                                <img src="data:image/png;base64,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" alt="ProfilePhoto" class="img-fluid">
+                            </div>
+
+                            <div class="col-sm-2" id="signatureContainer">
+                                <img src="data:image/png;base64,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" alt="SignaturePhoto" class="img-fluid">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--Section 1 - Personal Information Section -->
+
+                <div id="personalIntro">
+
+                    <div class="row">
+                        <div class="col-sm-12 border-left-0 border-right-0" id="personalInfoTitle">
+                            <b>
+                                <p class="secTitle">Personal information section</p>
+                            </b>
+                        </div>
+                    </div>
+
+                    <div class="row" id="nameInfo">
+                        <div class="col-sm-2">
+                            Title
+                        </div>
+                        <div class="col-sm-4">
+                            Last Name
+                        </div>
+                        <div class="col-sm-3">
+                            First Name
+                        </div>
+                        <div class="col-sm-3">
+                            Middle Name
+                        </div>
+                    </div>
+                    <!-- Student and father details -->
+                    <div class="row">
+                        <div class="col-sm-2">
+                            <span style="text-transform:uppercase;">
+                                MR.
+                            </span>
+                        </div>
+                        <div class="col-sm-4">
+                            <span style="text-transform:uppercase;">
+                                CHANDARIA
+                            </span>
+                        </div>
+                        <div class="col-sm-3">
+                            <span style="text-transform:uppercase;">
+                                DHRUVIL
+                            </span>
+                        </div>
+                        <div class="col-sm-3">
+                            <span style="text-transform:uppercase;">
+                                
+                            </span>
+                        </div>
+
+                        <!-- Student's furthur details -->
+                        <div class="col-sm-12">
+                            <b>Name as per Aadhar :</b> <span id="nameasperadhar" style="text-transform:uppercase;">
+                                
+                            </span>
+                        </div>
+                        <div class="col-sm-6">
+                            <b>Gender:</b> <span id="gender" style="text-transform:uppercase;">
+                                Male
+                            </span>
+                        </div>
+                        <div class="col-sm-6">
+                            <b>Nationality: </b><span id="nationality" style="text-transform:uppercase;">
+                                INDIAN
+                            </span>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <b>Date of Birth as per Leaving Certificate :</b> <span id="dob">
+                                10/09/2008
+                            </span>
+                        </div>
+                        <div class="col-sm-6">
+                            <b>Religion: </b><span id="religion" style="text-transform:uppercase;">
+                                JAIN
+                            </span>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <b>Birth Place :</b> <span id="birthPlace" style="text-transform:uppercase;">
+                                DOMBIVALI
+                            </span>
+                        </div>
+                        <div class="col-sm-6">
+                            <b>Aadhaar No.: </b><span id="religion" style="text-transform:uppercase;">
+                                360741808764
+                            </span>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <b>Birth Country :</b> <span id="birthPlace" style="text-transform:uppercase;">
+                                
+                            </span>
+                        </div>
+                        <div class="col-sm-6">
+                            <b>Sub Caste :</b> <span id="birthPlace" style="text-transform:uppercase;">
+                                
+                            </span>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <b>Birth / Domicile State :</b> <span id="birthState" style="text-transform:uppercase;">
+                                
+                            </span>
+                        </div>
+                        <div class="col-sm-6">
+                            <b>Academic Bank of Credits : </b><span id="abcNo" style="text-transform:uppercase;">
+                                
+                            </span>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <b>Birth District :</b> <span id="birthDistrict" style="text-transform:uppercase;">
+                                
+                            </span>
+                        </div>
+                        <div class="col-sm-6">
+                            <b>University Pre Reg. No. : </b><span id="PreRegNo" style="text-transform:uppercase;">
+                            </span>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <b>Marital Status : </b><span id="PreRegNo" style="text-transform:uppercase;">
+                                UnMarried
+                            </span>
+                        </div>
+                        <div class="col-sm-6">
+                            <b>No. of Attempts of Last qualifying Exam : </b><span id="lastQualifyAttempts" style="text-transform:uppercase;">
+                                0
+                            </span>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <b>Mother Tongue :</b> <span id="motherTongueInput" style="text-transform:uppercase;">
+                                GUJARATI
+                            </span>
+                        </div>
+                        <div class="col-sm-6">
+                            <b>In-house (Studied in the same college/school) : </b><span id="inHouse" style="text-transform:uppercase;">
+                                0
+                            </span>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <b>Blood group : </b><span id="inHouse" style="text-transform:uppercase;">
+                                A+
+                            </span>
+                        </div>
+                        <div class="col-sm-6">
+                            <b>Admission Category Type/ Linguistic Minority : </b><span id="inHouse" style="text-transform:uppercase;">
+                                MINORITY
+                            </span>
+                        </div>
+
+                    </div>
+
+                    <!-- Section 3 - Contact details -->
+                    <div id="contactContainer">
+                        <div class="row">
+                            <div class="col-sm-12 border-left-0 border-right-0" id="contactTitle">
+                                <b><p class="secTitle">Contact Details</p></b>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <b>Student Mobile No.: </b><span id="studentmobNo">
+                                    8928933133
+                                </span>
+                            </div>
+                            <div class="col-sm-6">
+                                <b>Student Email Id: </b><span id="emailId">
+                                    ashishchandaria@gmail.com
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--Guardian / Parent Information Section-->
+                    <div id="contactContainer">
+                        <div class="row">
+                            <div class="col-sm-12 border-left-0 border-right-0" id="contactTitle">
+                                <b><p class="secTitle">Parent's Details</p></b>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <b>Father's Name : </b><span id="fatherName">
+                                    ASHISH
+                                </span>
+                            </div>
+                            <div class="col-sm-6">
+                                <b>Mother's Name : </b><span id="fathermobNo">
+                                    PIYU
+                                </span>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <b>Father Mobile No : </b><span id="fathermobNo">
+                                    9833607721
+                                </span>
+                            </div>
+                            <div class="col-sm-6">
+                                <b>Mother Mobile No : </b><span id="fatherOccupation">
+                                    9967703127
+                                </span>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <b>Father's Email : </b><span id="fatherOccupation">
+                                    ashishchandaria@gmail.com
+                                </span>
+                            </div>
+                            <div class="col-sm-6">
+                                <b>Mother's Email : </b><span id="fatherOccupation">
+                                    piyuchandaria@gmail.com
+                                </span>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <b>Father's Occupation : </b><span id="fatherOccupation">
+                                    BUSINESS
+                                </span>
+                            </div>
+                            <div class="col-sm-6">
+                                <b>Mother's Occupation : </b><span id="fatherName">
+                                    HOME MAKER
+                                </span>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <b>Family Income : </b><span id="fathermobNo">
+                                    600000.00
+                                </span>
+                            </div>
+                            <div class="col-sm-6">
+                                <b>Parents Office Address : </b><span id="fatherOccupation">
+                                    
+                                </span>
+                            </div>
+
+                            <div class="col-sm-12">
+                                <b>Total Family Members : </b><span id="fatherName">
+                                    0
+                                </span>
+                            </div>
+                        </div>
+                        <!--<div class="row">
+                            <div class="col-sm-4">
+                                <b>Father's Name : </b><span id="fatherName">
+                                    ASHISH
+                                </span>
+                            </div>
+                            <div class="col-sm-4">
+                                <b>Father Mobile No : </b><span id="fathermobNo">
+                                    9833607721
+                                </span>
+                            </div>
+                            <div class="col-sm-4">
+                                <b>Father's Occupation : </b><span id="fatherOccupation">
+                                    BUSINESS
+                                </span>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <b>Total Family Members : </b><span id="fatherName">
+                                    0
+                                </span>
+                            </div>
+                            <div class="col-sm-6">
+                                <b>Annual Income of the Family : </b><span id="fathermobNo">
+                                    600000.00
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <b>Mother's Name : </b><span id="fathermobNo">
+                                    PIYU
+                                </span>
+                            </div>
+                            <div class="col-sm-4">
+                                <b>Mother Mobile No : </b><span id="fatherOccupation">
+                                    
+                                </span>
+                            </div>
+                            <div class="col-sm-4">
+                                <b>Mother's Email : </b><span id="fatherOccupation">
+                                    
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <b>Mother's Occupation : </b><span id="fatherName">
+                                    HOME MAKER
+                                </span>
+                            </div>-->
+                        
+                        <!--<div class="col-sm-6">
+                        <b>Parents Office Address : </b><span id="fatherOccupation">-->
+                        
+                        <!--</span>
+                            </div>
+                        </div>-->
+                        
+
+                    </div>
+
+                    <div id="contactContainer">
+                        <div class="row">
+                            <div class="col-sm-12 border-left-0 border-right-0" id="contactTitle">
+                                <b><p class="secTitle">Guardian Information Section</p></b>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <b>Guardian's Name : </b><span id="fatherOccupation">
+                                    
+                                </span>
+                            </div>
+                            <div class="col-sm-12">
+                                <b>Guardian's/Parent's Contact No. : </b><span id="fatherName">
+                                    
+                                </span>
+                            </div>
+                            <div class="col-sm-12">
+                                <b>Relation With Applicant : </b><span id="fathermobNo">
+                                    --
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <!-- section 2 - Address Details -->
+                    <div id="addressDetails">
+                        <div class="row">
+                            <div class="col-sm-12 border-left-0 border-right-0" id="addressTitle">
+                                <b><p class="secTitle">Address Details</p></b>
+                            </div>
+                        </div>
+
+                        <div class="row" id="addressContainer">
+                            <div class="col-sm-3">
+                                <b>Address of Correspondence: </b>
+                            </div>
+                            <div class="col-sm-6">
+                                
+                                <span id="addressField" style="text-transform:uppercase;">
+                                    72, Mahagiri Ashok Chakaravarti Road
+Ashok nagar, Kandivali-east
+                                </span>
+                            </div>
+                            <div class="col-sm-3">
+                                <b>PIN Code :</b>
+                                <span id="city" style="text-transform:uppercase;">
+                                    400101
+                                </span>
+                            </div>
+                            <div class="col-sm-3">
+                                <b>Country&nbsp; :</b>
+                                <span id="country" style="text-transform:uppercase;">
+                                    INDIA
+                                </span>
+                            </div>
+                            <div class="col-sm-3">
+                                <b>State :</b>
+                                <span id="state" style="text-transform:uppercase;">
+                                    Maharashta 
+                                </span>
+                            </div>
+                            <div class="col-sm-3">
+                                <b>District :</b>
+                                <span id="district" style="text-transform:uppercase;">
+                                    MUMBAI 
+                                </span>
+                            </div>
+                            <div class="col-sm-3">
+                                <b>City/Village :</b>
+                                <span id="city" style="text-transform:uppercase;">
+                                    MUMBAI
+                                </span>
+                            </div>
+
+                            <div class="col-sm-3">
+                                <b>Permanent Address&nbsp;:</b>
+                            </div>
+                            <div class="col-sm-6">
+                                <span id="permanentAdd" style="text-transform:uppercase;">
+                                    72, Mahagiri Ashok Chakaravarti Road
+Ashok nagar, Kandivali-east
+                                </span>
+                            </div>
+                            <div class="col-sm-3">
+                                <b>PIN Code :</b>
+                                <span id="city" style="text-transform:uppercase;">
+                                    
+                                </span>
+                            </div>
+                            <div class="col-sm-3">
+                                <b>Country&nbsp;: </b><span id="pCountry" style="text-transform:uppercase;">
+                                    INDIA
+                                </span>
+                            </div>
+                            <div class="col-sm-3">
+                                <b>State :</b><span id="pCountry" style="text-transform:uppercase;">
+                                    INDIA
+                                </span>
+                            </div>
+                            <div class="col-sm-3">
+                                <b>District: </b><span id="district2" style="text-transform:uppercase;">
+                                    MUMBAI 
+                                </span>
+                            </div>
+                            <div class="col-sm-3">
+                                <b>City/Village: </b><span id="city2" style="text-transform:uppercase;">
+                                    MUMBAI
+                                </span>
+                            </div>
+
+
+
+
+                        </div>
+                    </div>
+
+
+                    <!-- Section 4 -  Legal Reservation Information Section -->
+                    <div id="legalReservationInfo">
+                        <div class="row">
+                            <div class="col-sm-12 border-left-0 border-right-0" id="reservationTitle">
+                                <b><p class="secTitle">Legal Reservation Information Section</p></b>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <b>Caste Category: </b><span id="casteCategory" style="text-transform:uppercase;">
+                                    OPEN
+                                </span>
+                            </div>
+                            <div class="col-sm-6">
+                                <b> Admission Category Type/ Linguistic Minority: </b><span id="casteCategory" style="text-transform:uppercase;">
+                                    MINORITY
+                                </span>
+                            </div>
+                            <div class="col-sm-6">
+                                <b>Phy. Handicapped: </b><span id="handicapped" style="text-transform:uppercase;">
+                                    
+                                </span>
+                            </div>
+                            <div class="col-sm-6">
+                                <b>Learning Disability No.: </b><span id="learningDisabilityNo">
+                                    
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- section 5 - Social reservation (special category) inforation section -->
+                    <div id="socialReservation">
+                        <div class="row">
+                            <div class="col-sm-12 border-0" id="socialReservationTitle">
+                                <b><p class="secTitle">Social Reservation (Special Category) Information Section</p></b>
+                                <table class="table table-bordered" id="socialReservationtable">
+                                    <thead>
+                                        <tr>
+                                            <th width="10%" scope="col">SR No.</th>
+                                            <th scope="col">SOCIAL RESERVATION NAME</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- section 6 -  Education Details Section  -->
+                    <div id="educationDetails">
+                        <div class="row">
+                            <div class="col-sm-12 border-0" id="educationDetailTitle">
+                                <b><p class="secTitle">Education Details Section </p></b>
+                                <table class="table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th class="col-sm-2">Exam Name&nbsp;</th>
+                                            <th class="col-sm-2">Board/University</th>
+                                            <th class="col-sm-2">school/College</th>
+                                            <th class="col-sm-1">year of Passing</th>
+                                            <th class="col-sm-1">Exam Seat Number</th>
+                                            <th class="col-sm-1">Obtained Marks</th>
+                                            <th class="col-sm-1">Total Marks</th>
+                                            <th class="col-sm-1">Percentage</th>
+                                            <th class="col-sm-1">Month of Passing</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr style="text-transform:uppercase;">
+                                            <td class="col-sm-2">
+                                                ICSE
+                                            </td>
+                                            <td class="col-sm-2">
+                                                ICSE BOARD
+                                            </td>
+                                            <td class="col-sm-2">
+                                                THAKUR PUBLIC SCHOOL
+                                            </td>
+                                            <td class="col-sm-1">
+                                                2024
+                                            </td>
+                                            <td class="col-sm-1">
+                                                8199163
+                                            </td>
+                                            <td class="col-sm-1">
+                                                310
+                                            </td>
+                                            <td class="col-sm-1">
+                                                500
+                                            </td>
+                                            <td class="col-sm-1">
+                                                62
+                                            </td>
+                                            <td class="col-sm-1">
+                                                0
+                                            </td>
+                                        </tr>
+
+
+                                    </tbody>
+
+                                </table>
+
+                                
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- section 7 - Qualifying Exam Details Section  -->
+                    <div id="qualifyingExamDetails">
+                        <div class="row">
+                            <div class="col-sm-12 border-0" id="qualifyingExamTitle">
+                                <b><p class="secTitle">Qualifying Exam Details Section</p></b>
+                                <br>
+                                <span id="subHeading" style="text-transform:uppercase;">
+                                    <b>
+                                        Qualifying Exam Name: 
+                                    </b>
+                                </span>
+                                <table class="table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>College/School Attended</th>
+                                            <th>Board/university</th>
+                                            <th>Place</th>
+                                            <th>Last Exam Roll No</th>
+                                            <th>Obtained Marks</th>
+                                            <th>Total Marks</th>
+                                            <th>Percentage</th>
+                                            <th>Year Of Passing</th>
+                                            <th>Stream</th>
+                                            <th>Month of Passing</th>
+                                            <th>Education Gap</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        <tr style="text-transform:uppercase;">
+                                            <td>
+                                            </td>
+                                            <td>
+                                            </td>
+                                            <td>
+                                            </td>
+                                            <td>
+                                            </td>
+                                            <td>
+                                            </td>
+                                            <td>
+                                            </td>
+                                            <td>
+                                            </td>
+                                            <td>
+                                            </td>
+                                            <td>
+                                            </td>
+                                            <td>
+                                            </td>
+                                            <td>
+                                            </td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+
+
+                                <table class="table table-bordered" id="qulaifyingExamTable">
+                                    <thead>
+                                        <tr>
+                                            <th colspan="4">
+                                                Qualifying Exam Subject Details
+                                            </th>
+                                        </tr>
+                                        <tr>
+                                            <th width="10%">
+                                                Sr. No.
+                                            </th>
+                                            <th>
+                                                Subject Name
+                                            </th>
+                                            <th>
+                                                Total Marks
+                                            </th>
+                                            <th>
+                                                Obtained Marks
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+
+                                        
+                                    </tbody>
+                                </table>
+
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 8 - Subject Details Section  -->
+                    <div id="subjectDetailsSection">
+                        <div class="row">
+                            <div class="col-sm-12 border-0" id="subjectSectionTitle">
+
+                                <p class="secTitle"><b> Subject Details Section</b></p>
+
+                                <table id="subDetailsTable" class="create-table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="10%">Sr. No.</th>
+                                            <th id="GroupName">Group Name</th>
+                                            <th>Subject Name</th>
+                                        </tr>
+                                        
+                                    </thead>
+                                    <tbody>
+                                        <tr class="text-center" style="text-transform:uppercase;">
+                                            <td width="10%">1</td>
+                                            <td id="groupNameInput">
+                                                IT/SP
+                                            </td>
+                                            <td>
+                                                BOOK KEEPING AND ACCOUNTANCY,ECONOMICS,ENGLISH,HEALTH AND PHYSICAL EDUCATION,INFORMATION TECHNOLOGY,JALSURAKSHA AND ENVIRONMENT EDUCATION,ORGANIZATION OF COMMERCE AND MANAGEMENT,SECRETARIAL PRACTICE
+                                            </td>
+                                            
+                                        </tr>
+                                        <tr class="text-center" style="text-transform:uppercase;">
+                                            <td width="10%">2</td>
+                                            <td id="groupNameInput">
+                                                HINDI/SP
+                                            </td>
+                                            <td>
+                                                BOOK KEEPING AND ACCOUNTANCY,ECONOMICS,ENGLISH,HEALTH AND PHYSICAL EDUCATION,HINDI,JALSURAKSHA AND ENVIRONMENT EDUCATION,ORGANIZATION OF COMMERCE AND MANAGEMENT,SECRETARIAL PRACTICE
+                                            </td>
+                                            
+                                        </tr>
+                                        <tr class="text-center" style="text-transform:uppercase;">
+                                            <td width="10%">3</td>
+                                            <td id="groupNameInput">
+                                                MARKETING/SP
+                                            </td>
+                                            <td>
+                                                BOOK KEEPING AND ACCOUNTANCY,ECONOMICS,ENGLISH,HEALTH AND PHYSICAL EDUCATION,JALSURAKSHA AND ENVIRONMENT EDUCATION,MARKETING,ORGANIZATION OF COMMERCE AND MANAGEMENT,SECRETARIAL PRACTICE
+                                            </td>
+                                            
+                                        </tr>
+                                        <tr class="text-center" style="text-transform:uppercase;">
+                                            <td width="10%">4</td>
+                                            <td id="groupNameInput">
+                                                BANKING/SP
+                                            </td>
+                                            <td>
+                                                BANKING,BOOK KEEPING AND ACCOUNTANCY,ECONOMICS,ENGLISH,HEALTH AND PHYSICAL EDUCATION,JALSURAKSHA AND ENVIRONMENT EDUCATION,ORGANIZATION OF COMMERCE AND MANAGEMENT,SECRETARIAL PRACTICE
+                                            </td>
+                                            
+                                        </tr>
+                                        <tr class="text-center" style="text-transform:uppercase;">
+                                            <td width="10%">5</td>
+                                            <td id="groupNameInput">
+                                                IT/MATHS
+                                            </td>
+                                            <td>
+                                                BOOK KEEPING AND ACCOUNTANCY,ECONOMICS,ENGLISH,HEALTH AND PHYSICAL EDUCATION,INFORMATION TECHNOLOGY,JALSURAKSHA AND ENVIRONMENT EDUCATION,MATHEMATICS AND STATISTICS,ORGANIZATION OF COMMERCE AND MANAGEMENT
+                                            </td>
+                                            
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 9 - Attached Documents -->
+                    <div class="attachedDocsContainer">
+                        <div class="row">
+                            <div class="col-sm-12 border-0" id="attachedDocsTitle">
+                                <b>
+                                    <p class="secTitle">Attached Documents</p>
+                                </b>
+                                <div id="tableSixContainer" class="table-responsive">
+                                    <table class="table table-bordered" id="docTable">
+                                        <thead>
+                                            <tr>
+                                                <th width="10%">Sr No.</th>
+                                                <th>Name of Documents/Certificate</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                            <tr style="text-transform:uppercase;">
+                                                <td width="5%" class="text-center">1</td>
+                                                <td>
+                                                    AADHAR CARD
+                                                </td>
+                                            </tr>
+                                            <tr style="text-transform:uppercase;">
+                                                <td width="5%" class="text-center">2</td>
+                                                <td>
+                                                    10TH MARKSHEET
+                                                </td>
+                                            </tr>
+                                            <tr style="text-transform:uppercase;">
+                                                <td width="5%" class="text-center">3</td>
+                                                <td>
+                                                    ONLINE PART1 FORM
+                                                </td>
+                                            </tr>
+                                            <tr style="text-transform:uppercase;">
+                                                <td width="5%" class="text-center">4</td>
+                                                <td>
+                                                    ONLINE PART2 FORM
+                                                </td>
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div><br><br>
+                        <div style="page-break-after:always;"></div>
+                        <div class="attachedDocsContainer" style="border: solid 1px black; padding: 22px; page-break-after: always;">
+                            <div class="row text-center">
+                                
+                                <br><br>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12 border-0">
+                                    I am aware that –<br>
+                                    And I promise to remit the applicable fees. I give below all the particulars required.<br>
+                                    - I will not be allowed to appear for the final examination if my attendance is less than 75% of lectures derived in each term separately as per Maharashtra State Board &amp; Higher Secondary Education’s Rules &amp; Regulation No. 88 (1).<br>
+                                    - Wearing of Identity card is compulsory throughout the stay in campus.<br>
+                                    - Use of mobile phone is strictly prohibited in the college campus and if found using it, will lead to confiscation of the same for a year.<br>
+                                    - I will follow the dress code specified by the college.<br>
+                                    - If I damage the college property then disciplinary action will be taken against me.<br>
+                                    - Possession of a mobile phone in the Examination Hall / block will be treated as unfair means and will be punished accordingly.<br>
+                                    - There will be hybrid mode of lecture i.e. online as well as offline also.
+                                </div>
+                            </div>
+                            <br><br><br>
+                            <div class="row text-center">
+                                <div class="col-sm-12 text-center border-0"><b>UNDERTAKING</b></div>
+                                <br><br>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12 border-0">I further declare that I will abide by all the rules and the regulations of College / University of Mumbai.</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12 text-right border-0">
+                                    <img src="data:image/png;base64,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" alt="SignaturePhoto" class="img-fluid" width="160px" height="80px" style="margin-bottom:10px !important;"><br>
+                                    <b>SIGNATURE OF THE STUDENT</b>
+                                </div>
+                            </div><br><br>
+
+                            <div class="row text-center">
+                                <div class="col-sm-12 text-center border-0"><b>PERMISSION FROM PARENTS / GUARDIAN</b></div>
+                                <br><br><br>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12 border-0">I have permitted my son / Daughter / Ward to join the college and I shall ensure that he / she attends classes regularly and observes the above mentioned rules.</div>
+                            </div>
+                            <div class="row text-right">
+                                <div class="col-sm-12 text-right border-0">
+                                    <img src="data:image/png;base64,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" alt="SignaturePhoto" class="img-fluid" width="160px" height="80px" style="margin-bottom:10px !important;"><br>
+                                    <b>SIGNATURE OF THE PARENT / GUARDIAN </b>
+                                </div>
+                            </div><br><br>
+
+                            <div class="row">
+                                <div class="col-sm-12 text-left border-0">
+                                    <b>Attachments to be submitted along with the application</b><br>
+                                    - Admission Form.<br>
+                                    - Transaction Successful Receipt.<br>
+                                    - Xerox copy of 10th Marksheet.<br>
+                                    - Fees Challan.<br>
+                                    - Leaving Certificate and NOC (For taking admission in FYJC)<br>
+                                    - Copy of Aadhar Card.<br>
+                                    - Cancelled Cheque of their bank account.
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <br>
+                    <!-- Section 14 - For College/institute Use Only -->
+                    <div id="collegeUseOnly">
+                        <div class="row">
+                            <div class="col-sm-12" id="forCollegeTitle">
+                                <b>
+                                    <p class="secTitle">For College / Institute Use Only</p>
+                                </b>
+                            </div>
+
+                            
+
+                            <div class="col-sm-12" id="tableSevenContainer">
+                                <div>
+                                    <table class="table table-bordered" id="tableSeven">
+                                        <thead>
+                                            <tr>
+                                                <th id="thDesignation">
+                                                    Designation
+                                                </th>
+                                                <th>
+                                                    Remarks / Particular / Recommendation
+                                                </th>
+                                                <th id="thSignature">
+                                                    Signature and Date
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="remarkTableBody">
+                                            <tr>
+                                                <td>
+                                                    Admission Clerk
+                                                </td>
+                                                <td>
+                                                    <span id="remarkOneInput">
+
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span id="signatureOneInput">
+
+                                                    </span>
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>
+                                                    Admission Committee
+                                                </td>
+                                                <td>
+                                                    <span id="remarkTwoInput">
+
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span id="signatureTwoInput">
+
+                                                    </span>
+                                                </td>
+                                            </tr>
+
+
+                                            <tr>
+                                                <td>
+                                                    Accountant / cashier
+                                                </td>
+                                                <td>
+                                                    <span id="remarkthreeInput">
+
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span id="signatureThreeInput">
+
+                                                    </span>
+                                                </td>
+                                            </tr>
+
+
+                                            <tr>
+                                                <td>
+                                                    <span>
+                                                        Registrar/Office
+                                                        superintendent
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <div class="row">
+                                                        <div class="col-sm-12 border-0">
+                                                            <span id="remarkFourInput">
+                                                                Cash Received : 100
+                                                            </span>
+                                                        </div>
+
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span id="signatureFourInput">
+
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <!-- Main Container 2 -->
+                <div class="container" id="secondContainer" style="background-image: url(&quot;../../../../Images/watermark.png&quot;);">
+                    <div class="row" id="remarkTitle">
+                        <div class="col-sm-12 center" id="admissionTitle">
+                            <b>
+                                REMARK OF THE ADMISSION COMMITTEE
+                            </b>
+                        </div>
+                    </div>
+                    <div class="row" id="fillSection">
+                        <div class="col-sm-12" id="admissionCommittee">
+                            <div id="admissionRemark">
+                                <p>
+                                    May be admitted to Class__________________________________________________________________
+                                    Section___________________________
+                                </p>
+                                <p>
+                                    May be
+                                    Rejected_______________________________________________________________________________________________________________
+                                </p>
+                                <p>
+                                    Last date of payment of
+                                    fees___________________________________________________________________________________________________
+                                </p>
+
+                                <p>Admission may be cancelled if the fees are not paid by this date.</p>
+                            </div>
+
+                            <div class="row" id="principalAndCommittee">
+                                <div class="col-sm-6 ">
+                                    <div class="text-left" style="padding-left:50px;">
+                                        
+                                        Principal
+                                        <br>
+                                        <br>
+                                        Date: 
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div id="committeeSignature">
+                                        <span>
+                                            Signature of Admission Committee
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+                <div class="container" style="background-image: url(&quot;../../../../Images/watermark.png&quot;);">
+                    <div class="row">
+                        <div class="col-sm-12 border-0 text-right">
+                            <span style="font-size:12px;">Print Date : 10/06/2024</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+    </div></body></html>
